@@ -103,7 +103,7 @@ def cambiar_de_archivo():
     Se considera el cambio de archivo como un reseteo. No obstante conservamos los datos de coste total """
     #Borramos cachés
     st.cache_data.clear()
-    st.session_state.clear()
+    #st.session_state.clear()
     st.cache_resource.clear()
 
 def actualizar_consumos(cb):
