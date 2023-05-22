@@ -172,7 +172,7 @@ if __name__ == '__main__':
                     
                 validar_tamaño_documento(doc_chunks)
                 palabras = palabras_documentos(doc_chunks)
-                st.write("Número total de documentos:",len(doc_chunks),"|","Palabras totales:",palabras,"|","Coste acumulado ($):",st.session_state.get("coste_total",0))
+                st.write("Número total de documentos:",len(doc_chunks),"|","Palabras totales:",palabras,"|")
                                 
                 cadena = lang.pipeline_to_chain(
                     _docs=doc_chunks,
