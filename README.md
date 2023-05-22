@@ -9,9 +9,14 @@ La apliación usa el framework **LangChain** para agrupar el proceso, que consis
 
 # Cómo funciona
 
+## 0- Inserta tu API KEY de OpenAI
+De momento sólo está disponible el modelo Openai.
+
 ## 1- Carga un documento pdf
 El número máximo de palabras está limitado a 500.000
 
 ## 2- Haz preguntas sobre el contenido
 Las preguntas y respuestas se irán guardando en el historial que aparece en el desplegable de la izquierda
+
+Enlace a la app [aquí](https://chat-to-pdf.streamlit.app/).
 
