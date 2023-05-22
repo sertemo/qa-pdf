@@ -164,7 +164,7 @@ if __name__ == '__main__':
                             lang.texto_a_Document(
                                 depurar_pdf(uploaded_file))
                         )
-                        actualizar_consumos(cb)
+                        #actualizar_consumos(cb)
 
                 except Exception as e:
                     print(e)
