@@ -200,4 +200,5 @@ if __name__ == '__main__':
                 st.write(response)
                 actualizar_historial(pregunta,respuesta=response)
     mostrar_historial()
+    mostrar_consumos()
         
