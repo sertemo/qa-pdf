@@ -100,25 +100,31 @@ def mostrar_historial():
 def cambiar_de_archivo():
     """ funcion que se deberia ejecutar al cargar otro archivo diferente.\n
     Borramos todo el caché.\n
-    Se considera el cambio de archivo como un reseteo de todos los valores. """
+    Se considera el cambio de archivo como un reseteo. No obstante conservamos los datos de coste total """
     #Borramos cachés
     st.cache_data.clear()
     st.session_state.clear()
     st.cache_resource.clear()
 
-def actualizar_coste(cb):
+def actualizar_consumos(cb):
     """ 
-    Actualización del coste acumulado para el archivo actual procesado.
+    Actualización de los consumos acumulados para el archivo actual procesado.
     """
-
-    if "coste_total" in st.session_state:
-        st.session_state["coste_total"] += round(cb.total_cost,3)
-    else:
-        st.session_state["coste_total"] = round(cb.total_cost,3)
+    st.session_state["coste_total"] = st.session_state.get("coste_total",0) + round(cb.total_cost,3)   
+    st.session_state["total_tokens"] = st.session_state.get("total_tokens",0) + cb.total_tokens
+    st.session_state["completion_tokens"] = st.session_state.get("completion_tokens",0) + cb.completion_tokens
 
 def validar_coste_total():
     if st.session_state.get("coste_total",0.0) > limite_coste:
         st.stop("Has alcanzado el coste máximo para usar la aplicación.")
+
+def mostrar_consumos():
+    if "coste_total" in st.session_state:
+        with st.expander("Ver consumos acumulados"):
+            st.write("Coste total acumulado ($):",st.session_state.get("coste_total",0))
+            st.write("Tokens totales utilizados:",st.session_state.get("total_tokens",0))
+            st.write("'Completion Tokens' utilizados:",st.session_state.get("completion_tokens",0))
+
 
 ##################################
 
@@ -139,6 +145,9 @@ if __name__ == '__main__':
         )
         API_KEY = st.text_input(label="Api key",placeholder=f"Ingresa una api key válida de {model_type} para continuar")
     
+    #Añadir otro expander con los datos de coste acumulados si existe
+    mostrar_consumos()
+
     if API_KEY:
         try:
             llm_type = lang.instanciar_modelo(API_KEY,model_type=model_type)
@@ -155,7 +164,7 @@ if __name__ == '__main__':
                             lang.texto_a_Document(
                                 depurar_pdf(uploaded_file))
                         )
-                        actualizar_coste(cb)
+                        actualizar_consumos(cb)
 
                 except Exception as e:
                     print(e)
@@ -185,8 +194,8 @@ if __name__ == '__main__':
                 with st.spinner("Pensando..."):
                     with get_openai_callback() as cb:
                         response = devolver_respuesta(cadena,pregunta)
-                        actualizar_coste(cb)
-                        print(cb)
+                        actualizar_consumos(cb)
+                        #print(cb)
                 
                 st.write(response)
                 actualizar_historial(pregunta,respuesta=response)
