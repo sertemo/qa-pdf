@@ -144,10 +144,7 @@ if __name__ == '__main__':
             options=("openai",),
         )
         API_KEY = st.text_input(label="Api key",placeholder=f"Ingresa una api key válida de {model_type} para continuar")
-    
-    #Añadir otro expander con los datos de coste acumulados si existe
-    mostrar_consumos()
-
+   
     if API_KEY:
         try:
             llm_type = lang.instanciar_modelo(API_KEY,model_type=model_type)
