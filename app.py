@@ -11,12 +11,12 @@ st.set_page_config(
     page_title="Q&A PDF -STM-",   
     page_icon="💬",)
 
-#st.session_state.get("coste_total",0)
+#st.session_state
 
 ## Parámetros de la aplicación ##
 embedding_type = "openai"
 limite_palabras = 500_000
-limite_coste = 0.101
+limite_coste = 0.101 #no se usa
 #################################
 
 ## Funciones auxiliares ##
@@ -111,7 +111,7 @@ def actualizar_consumos(cb):
     """ 
     Actualización de los consumos acumulados para el archivo actual procesado.
     """
-    st.session_state["coste_total"] = st.session_state.get("coste_total",0) + round(cb.total_cost,3)   
+    st.session_state["coste_total"] = st.session_state.get("coste_total",0) + cb.total_cost
     st.session_state["total_tokens"] = st.session_state.get("total_tokens",0) + cb.total_tokens
     st.session_state["completion_tokens"] = st.session_state.get("completion_tokens",0) + cb.completion_tokens
 
