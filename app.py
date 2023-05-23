@@ -11,12 +11,12 @@ st.set_page_config(
     page_title="Q&A PDF -STM-",   
     page_icon="💬",)
 
-#st.session_state.get("coste_total",0)
+#st.session_state
 
 ## Parámetros de la aplicación ##
 embedding_type = "openai"
 limite_palabras = 500_000
-limite_coste = 0.101
+limite_coste = 0.101 #no se usa
 #################################
 
 ## Funciones auxiliares ##
@@ -54,7 +54,8 @@ def palabras_documentos(docs)->int:
     return sum([len(doc.page_content) for doc in docs])
 
 def calcular_coste_embeddings(palabras:int,llm_type:str)->str:
-    """ 
+    """
+    Función que no se usa.
     Devuelve el coste estimado en dólares de los embeddings\n
     en función del tipo de LLM escogido
     """
@@ -103,18 +104,19 @@ def cambiar_de_archivo():
     Se considera el cambio de archivo como un reseteo. No obstante conservamos los datos de coste total """
     #Borramos cachés
     st.cache_data.clear()
-    st.session_state.clear()
+    #st.session_state.clear()
     st.cache_resource.clear()
 
 def actualizar_consumos(cb):
     """ 
     Actualización de los consumos acumulados para el archivo actual procesado.
     """
-    st.session_state["coste_total"] = st.session_state.get("coste_total",0) + round(cb.total_cost,3)   
+    st.session_state["coste_total"] = st.session_state.get("coste_total",0) + cb.total_cost
     st.session_state["total_tokens"] = st.session_state.get("total_tokens",0) + cb.total_tokens
     st.session_state["completion_tokens"] = st.session_state.get("completion_tokens",0) + cb.completion_tokens
 
 def validar_coste_total():
+    """ Función que ya no se usa. """
     if st.session_state.get("coste_total",0.0) > limite_coste:
         st.stop("Has alcanzado el coste máximo para usar la aplicación.")
 
@@ -130,7 +132,7 @@ def mostrar_consumos():
 
 if __name__ == '__main__':
     
-    validar_coste_total()
+    #validar_coste_total()
 
     st.markdown("# :blue[Q]&A :red[PDF]💬 app")
     st.markdown(""" 
@@ -145,9 +147,6 @@ if __name__ == '__main__':
         )
         API_KEY = st.text_input(label="Api key",placeholder=f"Ingresa una api key válida de {model_type} para continuar")
     
-    #Añadir otro expander con los datos de coste acumulados si existe
-    mostrar_consumos()
-
     if API_KEY:
         try:
             llm_type = lang.instanciar_modelo(API_KEY,model_type=model_type)
@@ -172,7 +171,7 @@ if __name__ == '__main__':
                     
                 validar_tamaño_documento(doc_chunks)
                 palabras = palabras_documentos(doc_chunks)
-                st.write("Número total de documentos:",len(doc_chunks),"|","Palabras totales:",palabras,"|","Coste acumulado ($):",st.session_state.get("coste_total",0))
+                st.write("Número total de documentos:",len(doc_chunks),"|","Palabras totales:",palabras,"|")
                                 
                 cadena = lang.pipeline_to_chain(
                     _docs=doc_chunks,
@@ -200,4 +199,5 @@ if __name__ == '__main__':
                 st.write(response)
                 actualizar_historial(pregunta,respuesta=response)
     mostrar_historial()
+    mostrar_consumos()
         
