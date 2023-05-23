@@ -54,7 +54,8 @@ def palabras_documentos(docs)->int:
     return sum([len(doc.page_content) for doc in docs])
 
 def calcular_coste_embeddings(palabras:int,llm_type:str)->str:
-    """ 
+    """
+    Función que no se usa.
     Devuelve el coste estimado en dólares de los embeddings\n
     en función del tipo de LLM escogido
     """
@@ -115,6 +116,7 @@ def actualizar_consumos(cb):
     st.session_state["completion_tokens"] = st.session_state.get("completion_tokens",0) + cb.completion_tokens
 
 def validar_coste_total():
+    """ Función que ya no se usa. """
     if st.session_state.get("coste_total",0.0) > limite_coste:
         st.stop("Has alcanzado el coste máximo para usar la aplicación.")
 
@@ -130,7 +132,7 @@ def mostrar_consumos():
 
 if __name__ == '__main__':
     
-    validar_coste_total()
+    #validar_coste_total()
 
     st.markdown("# :blue[Q]&A :red[PDF]💬 app")
     st.markdown(""" 
@@ -144,7 +146,7 @@ if __name__ == '__main__':
             options=("openai",),
         )
         API_KEY = st.text_input(label="Api key",placeholder=f"Ingresa una api key válida de {model_type} para continuar")
-   
+    
     if API_KEY:
         try:
             llm_type = lang.instanciar_modelo(API_KEY,model_type=model_type)
@@ -161,7 +163,7 @@ if __name__ == '__main__':
                             lang.texto_a_Document(
                                 depurar_pdf(uploaded_file))
                         )
-                        #actualizar_consumos(cb)
+                        actualizar_consumos(cb)
 
                 except Exception as e:
                     print(e)
