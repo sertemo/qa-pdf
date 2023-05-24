@@ -145,7 +145,10 @@ if __name__ == '__main__':
             label="Modelo",
             options=("openai",),
         )
-        API_KEY = st.text_input(label="Api key",placeholder=f"Ingresa una api key válida de {model_type} para continuar")
+        API_KEY = st.text_input(
+            label="Api key",
+            placeholder=f"Ingresa una api key válida de {model_type} para continuar",
+            type="password",)
     
     if API_KEY:
         try:
