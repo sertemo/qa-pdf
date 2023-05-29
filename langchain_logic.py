@@ -95,7 +95,7 @@ def crear_vectorstore(_texts:list[Document],_embeddings)->FAISS:
 
 @st.cache_resource(show_spinner=False)
 def crear_retriever(_vectorstore:FAISS):
-   retriever = _vectorstore.as_retriever(search_kwargs={"k":2})
+   retriever = _vectorstore.as_retriever(search_kwargs={"k":3})
    return retriever
 
 @st.cache_resource(show_spinner=False)
