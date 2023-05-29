@@ -17,6 +17,9 @@ st.set_page_config(
 embedding_type = "openai"
 limite_palabras = 500_000
 limite_coste = 0.101 #no se usa
+MODEL_OPTIONS = (
+    "openai",
+)
 #################################
 
 ## Funciones auxiliares ##
@@ -143,7 +146,7 @@ if __name__ == '__main__':
     with st.expander("Credenciales del modelo"):
         model_type = st.selectbox(
             label="Modelo",
-            options=("openai",),
+            options=MODEL_OPTIONS,
         )
         API_KEY = st.text_input(
             label="Api key",
@@ -197,7 +200,7 @@ if __name__ == '__main__':
                     with get_openai_callback() as cb:
                         response = devolver_respuesta(cadena,pregunta)
                         actualizar_consumos(cb)
-                        #print(cb)
+                        print(cb)
                 
                 st.write(response)
                 actualizar_historial(pregunta,respuesta=response)

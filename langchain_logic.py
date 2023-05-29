@@ -38,7 +38,7 @@ def instanciar_modelo(
     
     llm_openai = ChatOpenAI(
         model_name="gpt-3.5-turbo",
-        temperature=0.2,
+        temperature=0.1,
         openai_api_key=api_key,
         streaming=True)
     #llm_wizardlm = cargar_modelo_hugg(hugg.pipe)
