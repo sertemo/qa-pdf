@@ -1,5 +1,5 @@
 import streamlit as st
-from typing import Literal
+from typing import Literal, Union
 
 #LangChain
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -13,7 +13,7 @@ from langchain.embeddings import HuggingFaceInstructEmbeddings, OpenAIEmbeddings
 #import hugging_logic as hugg
 
 #VectoreStore
-from langchain.vectorstores import FAISS
+from langchain.vectorstores import FAISS, DeepLake
 
 #Secrets
 #OPENAI_API_KEY = st.secrets.api_keys.OPENAI_API_KEY
@@ -86,17 +86,26 @@ def crear_embeddings(tipo:Literal["instructor","openai"],api_key):
     return embeddings
    
 @st.cache_resource(show_spinner=False)
-def crear_vectorstore(_texts:list[Document],_embeddings)->FAISS:
+def crear_vectorstore(_texts:list[Document],_embeddings):
     """ 
     Devuelve un vectorstore
     """
-    vectorstore = FAISS.from_documents(_texts,_embeddings)
+    #vectorstore = FAISS.from_documents(_texts,_embeddings)
+    vectorstore = DeepLake.from_documents(_texts,_embeddings)
     return vectorstore
 
 @st.cache_resource(show_spinner=False)
-def crear_retriever(_vectorstore:FAISS):
-   retriever = _vectorstore.as_retriever(search_kwargs={"k":3})
-   return retriever
+def crear_retriever(_vectorstore:Union[FAISS,DeepLake]):
+   
+    retriever = _vectorstore.as_retriever(
+        search_kwargs={
+            "distance_metric" : "cos",
+            "fetch_k" : 100,
+            "maximal_marginal_relevance" : True,
+            "k" : 10,
+        }
+    )
+    return retriever
 
 @st.cache_resource(show_spinner=False)
 def crear_cadena(_retriever,_llm_type):
