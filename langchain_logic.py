@@ -90,8 +90,8 @@ def crear_vectorstore(_texts:list[Document],_embeddings):
     """ 
     Devuelve un vectorstore
     """
-    #vectorstore = FAISS.from_documents(_texts,_embeddings)
-    vectorstore = DeepLake.from_documents(_texts,_embeddings)
+    vectorstore = FAISS.from_documents(_texts,_embeddings)
+    #vectorstore = DeepLake.from_documents(_texts,_embeddings)
     return vectorstore
 
 @st.cache_resource(show_spinner=False)
