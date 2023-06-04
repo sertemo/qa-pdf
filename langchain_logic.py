@@ -1,9 +1,9 @@
 import streamlit as st
-from typing import Literal
+from typing import Literal, Union
 
 #LangChain
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.llms import OpenAI, HuggingFacePipeline
+from langchain.llms import HuggingFacePipeline
 from langchain.chains import RetrievalQA
 from langchain.docstore.document import Document
 from langchain.chat_models import ChatOpenAI
@@ -13,7 +13,7 @@ from langchain.embeddings import HuggingFaceInstructEmbeddings, OpenAIEmbeddings
 #import hugging_logic as hugg
 
 #VectoreStore
-from langchain.vectorstores import FAISS
+from langchain.vectorstores import FAISS, DeepLake
 
 #Secrets
 #OPENAI_API_KEY = st.secrets.api_keys.OPENAI_API_KEY
@@ -38,9 +38,9 @@ def instanciar_modelo(
     
     llm_openai = ChatOpenAI(
         model_name="gpt-3.5-turbo",
-        temperature=0.2,
+        temperature=0.1,
         openai_api_key=api_key,
-        streaming=True)
+        streaming=False)
     #llm_wizardlm = cargar_modelo_hugg(hugg.pipe)
 
     if model_type == "openai":
@@ -86,17 +86,26 @@ def crear_embeddings(tipo:Literal["instructor","openai"],api_key):
     return embeddings
    
 @st.cache_resource(show_spinner=False)
-def crear_vectorstore(_texts:list[Document],_embeddings)->FAISS:
+def crear_vectorstore(_texts:list[Document],_embeddings):
     """ 
     Devuelve un vectorstore
     """
     vectorstore = FAISS.from_documents(_texts,_embeddings)
+    #vectorstore = DeepLake.from_documents(_texts,_embeddings)
     return vectorstore
 
 @st.cache_resource(show_spinner=False)
-def crear_retriever(_vectorstore:FAISS):
-   retriever = _vectorstore.as_retriever(search_kwargs={"k":2})
-   return retriever
+def crear_retriever(_vectorstore:Union[FAISS,DeepLake]):
+   
+    retriever = _vectorstore.as_retriever(
+        search_kwargs={
+            "distance_metric" : "cos",
+            "fetch_k" : 100,
+            "maximal_marginal_relevance" : True,
+            "k" : 10,
+        }
+    )
+    return retriever
 
 @st.cache_resource(show_spinner=False)
 def crear_cadena(_retriever,_llm_type):
