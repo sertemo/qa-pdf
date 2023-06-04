@@ -18,7 +18,7 @@ El número máximo de palabras está limitado a 500.000
 ## 2- Haz preguntas sobre el contenido
 Las preguntas y respuestas se irán guardando en el historial que aparece en el desplegable de la izquierda
 
-Enlace a la app [aquí](https://chat-to-pdf.streamlit.app/).
+Enlace a la app [aquí](https://q2-pdf.streamlit.app/).
 
 ## Actualizaciones
 *04/06/2023*
