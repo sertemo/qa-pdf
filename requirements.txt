@@ -5,5 +5,7 @@ pypdf
 sentence_transformers
 transformers
 faiss-cpu
-deeplake
 streamlit-chat
+yagmail
+keyring
+

@@ -3,7 +3,7 @@ from typing import Literal, Union
 
 #LangChain
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.llms import OpenAI, HuggingFacePipeline
+from langchain.llms import HuggingFacePipeline
 from langchain.chains import RetrievalQA
 from langchain.docstore.document import Document
 from langchain.chat_models import ChatOpenAI
@@ -40,7 +40,7 @@ def instanciar_modelo(
         model_name="gpt-3.5-turbo",
         temperature=0.1,
         openai_api_key=api_key,
-        streaming=True)
+        streaming=False)
     #llm_wizardlm = cargar_modelo_hugg(hugg.pipe)
 
     if model_type == "openai":
