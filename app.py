@@ -24,7 +24,7 @@ MODEL_OPTIONS = (
     "openai",
 )
 time_stamp = datetime.datetime.strftime(datetime.datetime.now(),format="%d-%m-%Y %H:%M:%S")
-TXT_NAME = f"Historial de Q-to PDF {time_stamp}.txt"
+TXT_NAME = f"Historial de Q2-pdf {time_stamp}.txt"
 GOOGLE_API_KEY = os.environ["GOOGLE_API_KEY"] #Esto para deploy
 #GOOGLE_API_KEY = st.secrets.api_keys["GOOGLE_API_KEY"] #Esto para local
 EMAIL_REGEX = re.compile(r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+')
@@ -126,14 +126,12 @@ def actualizar_historial(pregunta,respuesta,document):
         st.session_state["preguntas"] = [pregunta]
 
 def mostrar_historial():
-
-    if "responses" in st.session_state:        
-        with st.sidebar:
-            st.markdown("# Historial de :green[Q]&A")
-            #st.write("-------")
-            for q,a in zip(reversed(st.session_state["preguntas"]),reversed(st.session_state["responses"])):
-                message(q,is_user=True)
-                message(a)
+    if "responses" in st.session_state:     
+        st.markdown("# Historial de :green[Q]2-:red[pdf]")
+        #st.write("-------")
+        for q,a in zip(reversed(st.session_state["preguntas"]),reversed(st.session_state["responses"])):
+            message(q,is_user=True)
+            message(a)
 
 def crear_historial_str():
     historial_str = ""
@@ -171,25 +169,26 @@ def mandar_email(email:str,text:str)->None:
 
 def mostrar_opciones_descarga_historial(historial_str):
     if st.session_state.get("responses",None) is not None:
-        with st.sidebar:
-            with st.expander("Opciones de Historial"):
-                #Descarga el historial
-                st.download_button(
-                    label = "Descargar (.txt)",
-                    #on_click = historial_to_txt,
-                    data=historial_str,
-                    file_name=TXT_NAME,
-                )
-                email_receptor = st.text_input("Introduce un email",label_visibility="hidden",placeholder="Introduce un email")
-                if st.button("Enviar por email"):
-                    if email_receptor and is_valid_mail(email_receptor):
-                        try:
-                            mandar_email(email_receptor,historial_str)
-                            st.success("Email enviado correctamente")
-                        except Exception as exc:
-                            st.error(f"Se ha producido un error al enviar el email: {exc}")
-                    else:
-                        st.error("El email no es válido")
+        with st.expander("Opciones de Historial"):
+            #Descarga el historial
+            st.subheader("Descargar en formato txt")
+            st.download_button(
+                label = "Descargar",
+                #on_click = historial_to_txt,
+                data=historial_str,
+                file_name=TXT_NAME,
+            )            
+            st.subheader("Enviar historial por email")
+            email_receptor = st.text_input("Enviar historial por email",label_visibility="collapsed", placeholder="Introduce un email")
+            if st.button("Enviar al email"):
+                if email_receptor and is_valid_mail(email_receptor):
+                    try:
+                        mandar_email(email_receptor,historial_str)
+                        st.success("Email enviado correctamente")
+                    except Exception as exc:
+                        st.error(f"Se ha producido un error al enviar el email: {exc}")
+                else:
+                    st.error("El email no es válido")
 
 def cambiar_de_archivo():
     """ funcion que se deberia ejecutar al cargar otro archivo diferente.\n
@@ -227,7 +226,7 @@ if __name__ == '__main__':
     
     #validar_coste_total()
     
-    st.markdown("# :green[Q]2 :red[PDF]💬 app")
+    st.markdown("# :green[Q]2-:red[PDF]💬 app")
     st.markdown(""" 
 
         ## App para preguntar a tus documentos _pdf_ 📑. """)
@@ -295,7 +294,8 @@ if __name__ == '__main__':
         historial_str = crear_historial_str()
     except Exception:
         historial_str = ""
-    mostrar_historial()
-    mostrar_opciones_descarga_historial(historial_str)
+    with st.sidebar:
+        mostrar_opciones_descarga_historial(historial_str)
+        mostrar_historial()    
     mostrar_consumos()
         
