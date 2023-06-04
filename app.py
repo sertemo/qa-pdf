@@ -25,8 +25,8 @@ MODEL_OPTIONS = (
 )
 time_stamp = datetime.datetime.strftime(datetime.datetime.now(),format="%d-%m-%Y %H:%M:%S")
 TXT_NAME = f"Historial de Q-to PDF {time_stamp}.txt"
-#GOOGLE_API_KEY = os.environ["GOOGLE_API_KEY"] #Esto para deploy
-GOOGLE_API_KEY = st.secrets.api_keys["GOOGLE_API_KEY"] #Esto para local
+GOOGLE_API_KEY = os.environ["GOOGLE_API_KEY"] #Esto para deploy
+#GOOGLE_API_KEY = st.secrets.api_keys["GOOGLE_API_KEY"] #Esto para local
 EMAIL_REGEX = re.compile(r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+')
 YAG = yagmail.SMTP("tejedor.moreno.dev@gmail.com",GOOGLE_API_KEY)
 #################################
