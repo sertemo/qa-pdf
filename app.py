@@ -14,8 +14,6 @@ st.set_page_config(
     page_title="Q2 PDF -STM-",   
     page_icon="💬",)
 
-#st.session_state
-
 ## Parámetros de la aplicación ##
 embedding_type = "openai"
 limite_palabras = 500_000
@@ -106,7 +104,7 @@ def devolver_respuesta(_cadena,pregunta):
         respuesta = _cadena(pregunta)
         return respuesta["result"]
 
-def actualizar_historial(pregunta,respuesta,document):
+def actualizar_historial(pregunta,respuesta,document):#!SUSTITUIDO POR LA VERSION OP
     """ Verifica si existe en la sesión alguna respuesta y si están duplicadas. Si la pregunta y la respuesta ya\n
      existen, no actualiza el historial.
       Actualiza tambien el documento sobre el que se hacen las preguntas. """
@@ -125,7 +123,7 @@ def actualizar_historial(pregunta,respuesta,document):
     else:
         st.session_state["preguntas"] = [pregunta]
 
-def mostrar_historial():
+def mostrar_historial():#!SUSTITUIDO POR LA VERSION OP
     if "responses" in st.session_state:     
         st.markdown("# Historial de :green[Q]2-:red[pdf]")
         #st.write("-------")
@@ -133,7 +131,7 @@ def mostrar_historial():
             message(q,is_user=True)
             message(a)
 
-def crear_historial_str():
+def crear_historial_str():#!SUSTITUIDO POR LA VERSION OP
     historial_str = ""
     historial_str = historial_str.join(
         [f"Documento:{d}\nP: {q}\nR: {a}\n\n" 
@@ -149,6 +147,40 @@ def crear_historial_str():
     Coste total ($): {st.session_state.get("coste_total",0)}"""
     return historial_str
 
+def crear_historial_str_op():
+    historial_str = "" #Para descargar el txt
+    historial_HTML = "" #Para enviar al mail
+    for dict_doc in st.session_state.values():
+        if isinstance(dict_doc,dict):
+            for idx,doc in enumerate(dict_doc.items(),start=1):
+                historial_str += f"DOCUMENTO {idx}: {os.path.splitext(doc[0])[0]}\n\n"
+                historial_HTML += f"<b style='color : #0e5188'>DOCUMENTO {idx}: {os.path.splitext(doc[0])[0]}</b>\n\n"
+                for idx,(p,r) in enumerate(zip(*doc[1].values()),start=1):
+                    historial_str += f"\t{idx} - {p}\n"
+                    historial_str += f"\t{r}\n\n"
+                    historial_HTML += f"\t<b style='color : #0e5188' >{idx} - </b><i style='color : #2a9cc1'>{p}</i>\n"
+                    historial_HTML += f"\t{r}\n\n"               
+
+    historial_str += f"""----\n\nTipo de modelo: {model_type}\nConsumos:\n\
+    Tokens totales: {st.session_state.get("total_tokens",0)}\n\
+    Coste total ($): {st.session_state.get("coste_total",0)}"""
+    
+    historial_HTML += f"""----\n
+    <table class="default">
+        <tr>
+            <th>Tipo de modelo</th>
+            <th>Tokens consumidos</th>
+            <th>Coste total ($)</th>
+        </tr>
+        <tr>
+            <td>{model_type}</td>
+            <td>{st.session_state.get("total_tokens",0)}</td>
+            <td>{st.session_state.get("coste_total",0)}</td>
+        </tr>
+    </table>"""
+
+    return historial_str, historial_HTML
+
 def mandar_email(email:str,text:str)->None:
     """Función para enviar por email con yagmail el historial de mensajes
     y los consumos de tokens
@@ -162,13 +194,12 @@ def mandar_email(email:str,text:str)->None:
     """
     YAG.send(
     to=email,
-    subject=TXT_NAME[:-4], #Aqui le quitamos la extensión
+    subject=TXT_NAME[:-4], #Aqui le quitamos la extensión o usar os.path.splitext()
     contents=text, 
     #attachments=filename,
 )
 
-def mostrar_opciones_descarga_historial(historial_str):
-    if st.session_state.get("responses",None) is not None:
+def mostrar_opciones_descarga_historial(historial_str,historial_HTML):    
         with st.expander("Opciones de Historial"):
             #Descarga el historial
             st.subheader("Descargar en formato txt")
@@ -183,7 +214,7 @@ def mostrar_opciones_descarga_historial(historial_str):
             if st.button("Enviar al email"):
                 if email_receptor and is_valid_mail(email_receptor):
                     try:
-                        mandar_email(email_receptor,historial_str)
+                        mandar_email(email_receptor,historial_HTML)
                         st.success("Email enviado correctamente")
                     except Exception as exc:
                         st.error(f"Se ha producido un error al enviar el email: {exc}")
@@ -219,13 +250,52 @@ def mostrar_consumos():
             st.write("Tokens totales utilizados:",st.session_state.get("total_tokens",0))
             st.write("'Completion Tokens' utilizados:",st.session_state.get("completion_tokens",0))
 
+###Tests de formateo de muestra de historial para mostrar solo 1 documento por pregunta / respuesta
+def actualizar_historial_op(pregunta,respuesta,document):
+    """Version mejorada del actualizar historial
+    para poder mostrar los documentos y las preguntas y respuestas
+
+    Parameters
+    ----------
+    pregunta : str
+        _description_
+    respuesta : str
+        _description_
+    document : str
+        _description_
+    """
+
+    if st.session_state["docs"].get(document,None) is None:
+        st.session_state["docs"][document] = {
+        "preguntas" : [],
+        "respuestas" : [],
+    }
+
+    if pregunta and (pregunta not in st.session_state["docs"][document]["preguntas"]):
+        st.session_state["docs"][document]["preguntas"].append(pregunta)
+        st.session_state["docs"][document]["respuestas"].append(respuesta)
+        pregunta, respuesta = None, None
+
+def mostrar_historial_op():
+    st.markdown("# Historial de :green[Q]2-:red[pdf]")
+    for dict_doc in st.session_state.values():
+        if isinstance(dict_doc,dict):
+            for idx,doc in enumerate(dict_doc.items(),start=1):
+                st.write(f"*Documento {idx}* : :green[**{os.path.splitext(doc[0])[0]}**]")
+                for (p,r) in zip(*doc[1].values()):
+                    message(p,is_user=True)
+                    message(r)
+
 
 ##################################
 
 if __name__ == '__main__':
-    
-    #validar_coste_total()
-    
+
+    #Inicializamos variable de entorno para recibir historial
+    if st.session_state.get("docs",None) is None:
+        st.session_state["docs"] = {}
+    st.session_state["activador_historial"] = st.session_state.get("activador_historial",False)
+     
     st.markdown("# :green[Q]2-:red[PDF]💬 app")
     st.markdown(""" 
 
@@ -275,7 +345,7 @@ if __name__ == '__main__':
                        
             st.markdown("### Haz una pregunta sobre tu documento")
             pregunta = st.text_input("pregunta",
-                        key="question",
+                        #key="question",
                         placeholder="¿ Qué quieres preguntar ?",
                         label_visibility="hidden")
 
@@ -289,13 +359,17 @@ if __name__ == '__main__':
                         print(cb)
                 
                 st.write(response)
-                actualizar_historial(pregunta,respuesta=response,document=uploaded_file.name)
+                actualizar_historial_op(pregunta,respuesta=response,document=uploaded_file.name)
+                st.session_state["activador_historial"] = True
     try:
-        historial_str = crear_historial_str()
+        historial_str, historial_HTML = crear_historial_str_op()
     except Exception:
         historial_str = ""
+        historial_HTML = ""
     with st.sidebar:
-        mostrar_opciones_descarga_historial(historial_str)
-        mostrar_historial()    
+        if st.session_state["activador_historial"]:
+            mostrar_opciones_descarga_historial(historial_str,historial_HTML)
+            mostrar_historial_op()    
     mostrar_consumos()
-        
+
+#st.session_state
