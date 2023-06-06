@@ -21,7 +21,10 @@ Las preguntas y respuestas se irán guardando en el historial que aparece en el 
 Enlace a la app [aquí](https://q2-pdf.streamlit.app/).
 
 ## Actualizaciones
-*04/06/2023*
-Añadida la posibilidad de descargar el historial de mensajes en archivo.txt
-Añadida también la posibilidad de enviarse el historial de mensajes por email (mejora: enviar con formato HTML)
+*04/06/2023* 
+- Añadida la posibilidad de descargar el historial de mensajes en archivo.txt
+- Añadida también la posibilidad de enviarse el historial de mensajes por email (mejora: enviar con formato HTML)
+*06/06/2023*
+- Mejorada la presentación del historial: aparece una sola vez el documento por cada pregunta y respuesta.
+- Añadido formato HTML para el archivo que se envía por email con negritas y algunos colores.
 
