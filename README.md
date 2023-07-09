@@ -27,4 +27,9 @@ Enlace a la app [aquí](https://q2-pdf.streamlit.app/).
 *06/06/2023*
 - Mejorada la presentación del historial: aparece una sola vez el documento por cada pregunta y respuesta.
 - Añadido formato HTML para el archivo que se envía por email con negritas y algunos colores.
+*09/07/2023*
+- Implementada nueva característica de visualización del chat.
+- Movida la configuración de API Key, opciones de historial etc a la barra lateral izquierda.
+- Movido el historial de chats a la ventana central.
+
 
