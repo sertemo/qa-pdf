@@ -280,7 +280,7 @@ if __name__ == '__main__':
     st.markdown("# :green[Q]2-:red[PDF]💬 app")
     
     with st.sidebar:
-        st.subheader("APP")
+        st.subheader("Pasos")
         st.caption("""        
         1. Ingresa una API key válida de OpenAI.\n
         2. Arrastra un archivo pdf.
