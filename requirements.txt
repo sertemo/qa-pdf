@@ -2,11 +2,9 @@ langchain
 openai
 tiktoken
 pypdf
-sentence_transformers
-transformers
 faiss-cpu
-streamlit-chat
 yagmail
 keyring
 requests
+python-dotenv
 
