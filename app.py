@@ -4,7 +4,6 @@ from io import BytesIO
 from pypdf import PdfReader
 import re
 from langchain.callbacks import get_openai_callback
-from streamlit_chat import message
 import datetime
 import os
 import yagmail
@@ -104,49 +103,6 @@ def calcular_coste_embeddings(palabras:int,llm_type:str)->str:
 def devolver_respuesta(_cadena,pregunta):
         respuesta = _cadena(pregunta)
         return respuesta["result"]
-
-def actualizar_historial(pregunta,respuesta,document):#!SUSTITUIDO POR LA VERSION OP
-    """ Verifica si existe en la sesión alguna respuesta y si están duplicadas. Si la pregunta y la respuesta ya\n
-     existen, no actualiza el historial.
-      Actualiza tambien el documento sobre el que se hacen las preguntas. """
-
-    if "responses" in st.session_state:
-        if respuesta not in st.session_state["responses"]:
-            st.session_state["responses"].append(respuesta)
-            st.session_state["documents"].append(document)
-    else:
-        st.session_state["responses"] = [respuesta]
-        st.session_state["documents"] = [document]
-
-    if "preguntas" in st.session_state:
-        if pregunta not in st.session_state["preguntas"]:
-            st.session_state["preguntas"].append(pregunta)
-    else:
-        st.session_state["preguntas"] = [pregunta]
-
-def mostrar_historial():#!SUSTITUIDO POR LA VERSION OP
-    if "responses" in st.session_state:     
-        st.markdown("# Historial de :green[Q]2-:red[pdf]")
-        #st.write("-------")
-        for q,a in zip(reversed(st.session_state["preguntas"]),reversed(st.session_state["responses"])):
-            message(q,is_user=True)
-            message(a)
-
-def crear_historial_str():#!SUSTITUIDO POR LA VERSION OP
-    historial_str = ""
-    historial_str = historial_str.join(
-        [f"Documento:{d}\nP: {q}\nR: {a}\n\n" 
-         for q,a,d 
-         in 
-         zip(
-        st.session_state["preguntas"],
-        st.session_state["responses"],
-        st.session_state["documents"])])
-    
-    historial_str += f"""\n\nTipo de modelo: {model_type}\nConsumos:\n\
-    Tokens totales: {st.session_state.get("total_tokens",0)}\n\
-    Coste total ($): {st.session_state.get("coste_total",0)}"""
-    return historial_str
 
 def crear_historial_str_op():
     historial_str = "" #Para descargar el txt
@@ -322,7 +278,7 @@ if __name__ == '__main__':
     st.markdown("# :green[Q]2-:red[PDF]💬 app")
     
     with st.sidebar:
-        st.subheader("Pasos")
+        st.subheader("APP")
         st.caption("""        
         1. Ingresa una API key válida de OpenAI.\n
         2. Arrastra un archivo pdf.
