@@ -10,6 +10,7 @@ import yagmail
 import pytz
 import requests
 from dotenv import load_dotenv
+import time
 
 load_dotenv()
 
@@ -53,6 +54,22 @@ def is_valid_mail(email:str)->bool:
     else:
         return False
 
+def stream_response_assistant(llm_texto:str,cadencia:float=0.02)->None:
+    """Streamea la respuesta del LLM como chat message con una cadencia determinada
+
+    Parameters
+    ----------
+    texto : str
+        El texto a streamear
+    cadencia : float, optional
+        en segundos cuanto espera antes de mostrar la siguiente cadena de texto, by default 0.02   """
+    frase = ""
+    output = st.empty()
+    for char in llm_texto:
+        frase += char
+        output.write(frase)
+        time.sleep(cadencia)
+
 @st.cache_data(show_spinner=False)
 def depurar_pdf(file: BytesIO) -> list[str]:
     """ 
@@ -85,21 +102,6 @@ def validar_tamaño_documento(_docs):
 
 def palabras_documentos(docs)->int:
     return sum([len(doc.page_content) for doc in docs])
-
-def calcular_coste_embeddings(palabras:int,llm_type:str)->str:
-    """
-    Función que no se usa.
-    Devuelve el coste estimado en dólares de los embeddings\n
-    en función del tipo de LLM escogido
-    """
-    coste = 0.00
-    TARIFA_EMBEDDINGS_OPENAI = 0.0004 # $/1000 tokens
-    n_tokens = 1.3333 * palabras
-
-    if llm_type == "openai":
-        coste = n_tokens / 1000 * TARIFA_EMBEDDINGS_OPENAI
-
-    return round(coste,3)
 
 @st.cache_data(show_spinner=False)
 def devolver_respuesta(_cadena,pregunta):
@@ -228,7 +230,6 @@ def validar_api_key(api_key:str)->tuple[bool,str]:
         print("Ocurrió un error al validar la API key:", e)
         return False, f"Ocurrió un error al validar la API key: {e}"
 
-###Tests de formateo de muestra de historial para mostrar solo 1 documento por pregunta / respuesta
 def actualizar_historial_op(pregunta,respuesta,document)->None:
     """Version mejorada del actualizar historial
     para poder mostrar los documentos y las preguntas y respuestas
@@ -259,10 +260,16 @@ def mostrar_historial_op()->None:
         if isinstance(dict_doc,dict):
             for idx,doc in enumerate(dict_doc.items(),start=1):
                 st.write(f"*Documento {idx}* : :green[**{os.path.splitext(doc[0])[0]}**]")
-                for (p,r) in zip(*doc[1].values()):
+                for indice,(p,r) in enumerate(zip(*doc[1].values()),start=1):
                     with st.chat_message("user"):
                         st.write(p)
                     with st.chat_message("assistant"):
+                        if indice == len(st.session_state["docs"][doc[0]]["preguntas"]) \
+                            and st.session_state["activador_stream"] \
+                            and idx == len(st.session_state["docs"]):
+                            stream_response_assistant(r)
+                            st.session_state["activador_stream"] = False
+                            break
                         st.write(r)
 
 def desactivar_chat()->bool:
@@ -276,9 +283,10 @@ if __name__ == '__main__':
     if st.session_state.get("docs",None) is None:
         st.session_state["docs"] = {}
     st.session_state["activador_historial"] = st.session_state.get("activador_historial",False)
+    st.session_state["activador_stream"] = st.session_state.get("activador_stream",False)
      
     st.markdown("# :green[Q]2-:red[PDF]💬 app")
-    
+        
     with st.sidebar:
         st.subheader("Pasos")
         st.caption("""        
@@ -341,19 +349,18 @@ if __name__ == '__main__':
 
     if st.session_state.get("archivo_cargado",None) is not None:        
         pregunta = st.chat_input(placeholder=f"Haz preguntas sobre {nombre_arch}",disabled=desactivar_chat())
-
         if pregunta:
             with st.spinner("Pensando..."):
                 with get_openai_callback() as cb:
                     response = devolver_respuesta(cadena,pregunta)
-                    actualizar_consumos(cb)
-            
+                    actualizar_consumos(cb)          
             actualizar_historial_op(pregunta,respuesta=response,document=uploaded_file.name)
             st.session_state["activador_historial"] = True
+            st.session_state["activador_stream"] = True
 
-
-    if st.session_state["activador_historial"]:
+    if st.session_state["activador_historial"]:               
         mostrar_historial_op()
+
         try:
             historial_str, historial_HTML = crear_historial_str_op()
         except Exception:
