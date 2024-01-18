@@ -115,7 +115,7 @@ def crear_cadena(_retriever,_llm_type):
                                     return_source_documents=False,)    
     return chain
 
-@st.cache_data(show_spinner=False)
+@st.cache_resource(show_spinner=False)
 def pipeline_to_chain(
     _docs:list[Document],
     _llm_type,
