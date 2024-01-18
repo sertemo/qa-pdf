@@ -1,0 +1,4 @@
+*.env
+secrets.toml
+k.txt
+hugging_logic.py
