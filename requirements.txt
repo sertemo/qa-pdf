@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 langchain
 openai
 tiktoken
@@ -8,3 +9,15 @@ keyring
 requests
 python-dotenv
 
+=======
+langchain
+openai
+tiktoken
+pypdf
+faiss-cpu
+yagmail
+keyring
+requests
+python-dotenv
+
+>>>>>>> 7191bd2583c83b4c110ac69bcdd0246340bfeeeb
