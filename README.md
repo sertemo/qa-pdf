@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Aplicación para Preguntas y Respuestas con tus documentos pdf
 
 La apliación usa el framework **LangChain** para agrupar el proceso, que consiste en:
